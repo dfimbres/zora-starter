@@ -73,7 +73,7 @@
   border: 1px solid #eaeaea;
   border-radius: 10px;
   transition: color 0.15s ease, border-color 0.15s ease;
-  max-width: 350px;
+  max-width: 150px;
 }
 
 .card:hover,
@@ -90,8 +90,11 @@
 
 .card p {
   margin: 0;
-  font-size: 1.2rem;
-  line-height: 1.5;
+  font-size: .7rem;
+}
+
+.price {
+  font: 12px;
 }
 
 @media (max-width: 600px) {

@@ -4,14 +4,15 @@ import Head from 'next/head';
 import styles from '../styles/Home.module.css';
 import { ZDK, ZDKNetwork, ZDKChain } from "@zoralabs/zdk";
 import { useEffect, useState } from 'react';
-
-import devs4Rev from '../apis/dev4Rev';
-import ownerTokens from '../apis/ownerTokens'
 import { useAccount } from 'wagmi';
+
+import devs4Rev from './api/dev4Rev';
+import marketInfo from './api/marketInfo';
+import ownerTokens from './api/ownerTokens'
 
 const Home: NextPage = () => {
   const { data: account } = useAccount()
-  const [nfts, setNFTs] = useState([]);
+  const [nfts, setNFTs] = useState({});
 
   const networkInfo = {
       network: ZDKNetwork.Ethereum,
@@ -24,22 +25,25 @@ const Home: NextPage = () => {
                 networks:[networkInfo], 
                 apiKey: process.env.API_KEY 
               } 
-
   
   const zdk = new ZDK(args)
 
   useEffect(() => {
     //  devs4Rev(zdk);
     const fetchData = async () => {
-      const data = await ownerTokens(zdk, account?.address);
+      // const data = await devs4Rev(zdk);
+      // const data = await ownerTokens(zdk, account?.address);
+      const data = await marketInfo(zdk, "0xca21d4228cdcc68d4e23807e5e370c07577dd152");
+
       setNFTs(data);
     }
 
     fetchData();
     }, [])
   
-  console.log(nfts, 'here');
-  
+
+    console.log(nfts);
+    
   return (
     <div className={styles.container}>
       <Head>
@@ -61,10 +65,18 @@ const Home: NextPage = () => {
         </p>
 
         <div className={styles.grid}>
-          <a href="https://rainbowkit.com" className={styles.card}>
-            <h2>RainbowKit Documentation &rarr;</h2>
-            <p>Learn how to customize your wallet connection flow.</p>
-          </a>
+            { nfts?.markets?.nodes.map((item, index) => {
+              return (
+                <a href="https://rainbowkit.com" className={styles.card}>
+                <h2>{item.token.name} &rarr;</h2>
+                  <img src={item.token.image.url} />
+                  <h4 key={index+'ETH'}>ETH: {item.market.price.nativePrice.decimal}</h4>
+                  <p key={index+'USDC'} className={styles.price}>USDC: {item.market.price.usdcPrice.decimal.toFixed(2)}</p>
+                </a>
+              )
+            }) }
+          
+
         </div>
       </main>
 
