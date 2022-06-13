@@ -6,8 +6,7 @@ const ownerTokens =  async (zdk, ownerAddresses) => {
         }
       });
   
-      console.log(results);
-      return results;
+      return results.tokens.nodes;
     } catch(e) {
         console.log(e);
     }

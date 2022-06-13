@@ -3,13 +3,16 @@ import type { NextPage } from 'next';
 import Head from 'next/head';
 import styles from '../styles/Home.module.css';
 import { ZDK, ZDKNetwork, ZDKChain } from "@zoralabs/zdk";
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 
 import devs4Rev from '../apis/dev4Rev';
 import ownerTokens from '../apis/ownerTokens'
+import { useAccount } from 'wagmi';
 
 const Home: NextPage = () => {
-  
+  const { data: account } = useAccount()
+  const [nfts, setNFTs] = useState([]);
+
   const networkInfo = {
       network: ZDKNetwork.Ethereum,
       chain: ZDKChain.Mainnet,
@@ -26,9 +29,16 @@ const Home: NextPage = () => {
   const zdk = new ZDK(args)
 
   useEffect(() => {
-   devs4Rev(zdk);
-   ownerTokens(zdk, 'kidme.eth');
-  }, [])
+    //  devs4Rev(zdk);
+    const fetchData = async () => {
+      const data = await ownerTokens(zdk, account?.address);
+      setNFTs(data);
+    }
+
+    fetchData();
+    }, [])
+  
+  console.log(nfts, 'here');
   
   return (
     <div className={styles.container}>
@@ -47,7 +57,7 @@ const Home: NextPage = () => {
         </h1>
 
         <p className={styles.description}>
-          Get started by editing{' '}
+          NFT data DUMP 🙃
         </p>
 
         <div className={styles.grid}>
