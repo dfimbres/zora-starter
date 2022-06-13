@@ -6,13 +6,13 @@ import { ZDK, ZDKNetwork, ZDKChain } from "@zoralabs/zdk";
 import { useEffect, useState } from 'react';
 import { useAccount } from 'wagmi';
 
-import devs4Rev from './api/dev4Rev';
+import lastZorbSales from './api/lastZorbSales';
 import marketInfo from './api/marketInfo';
 import ownerTokens from './api/ownerTokens'
 
 const Home: NextPage = () => {
   const { data: account } = useAccount()
-  const [nfts, setNFTs] = useState({});
+  const [zorbs, setZorbs] = useState({});
 
   const networkInfo = {
       network: ZDKNetwork.Ethereum,
@@ -31,19 +31,18 @@ const Home: NextPage = () => {
   useEffect(() => {
     //  devs4Rev(zdk);
     const fetchData = async () => {
-      // const data = await devs4Rev(zdk);
-      // const data = await ownerTokens(zdk, account?.address);
-      const data = await marketInfo(zdk, "0xca21d4228cdcc68d4e23807e5e370c07577dd152");
+      const zorbData = await lastZorbSales(zdk);
+      // const holderNFts = await ownerTokens(zdk, account?.address);
+      // const data = await marketInfo(zdk, "0xca21d4228cdcc68d4e23807e5e370c07577dd152");
 
-      setNFTs(data);
+      setZorbs(zorbData);
+      // console.log(holderNFts);
+      
     }
 
     fetchData();
     }, [])
-  
 
-    console.log(nfts);
-    
   return (
     <div className={styles.container}>
       <Head>
@@ -65,13 +64,16 @@ const Home: NextPage = () => {
         </p>
 
         <div className={styles.grid}>
-            { nfts?.markets?.nodes.map((item, index) => {
+            { zorbs?.sales?.nodes.map((item, index) => {
+              let { tokenId, name, image } = item.token;
+              let { nativePrice, usdcPrice } = item.sale.price;
+
               return (
-                <a href="https://rainbowkit.com" className={styles.card}>
-                <h2>{item.token.name} &rarr;</h2>
-                  <img src={item.token.image.url} />
-                  <h4 key={index+'ETH'}>ETH: {item.market.price.nativePrice.decimal}</h4>
-                  <p key={index+'USDC'} className={styles.price}>USDC: {item.market.price.usdcPrice.decimal.toFixed(2)}</p>
+                <a key={index + 'a'} href={`https://zorb.dev/nft/${tokenId}`} className={styles.card}>
+                <h2 key={index + 'h2'} > {name} &rarr;</h2>
+                  <img key={index + 'img'} src={image.url} />
+                  <h4 key={index+'ETH'} > {nativePrice.currency.name}: {nativePrice.decimal}</h4>
+                  <p key={index+'USDC'} className={styles.price}>USDC: {usdcPrice.decimal.toFixed(2)}</p>
                 </a>
               )
             }) }
