@@ -1,15 +1,12 @@
 const marketInfo = async (zdk, address) => {
     try {
-        let results = await zdk.markets({
+        let results = await zdk.floorPrice({
           'where': {
-            'collectionAddresses': [address]
+            'collectionAddresses': "0xca21d4228cdcc68d4e23807e5e370c07577dd152"
           },
-          // 'pagination': {
-          //     'limit': 4
-          // }
         });
     
-        return results;
+        return results.aggregateStat.floorPrice;
       } catch(e) {
           console.log(e);
       }

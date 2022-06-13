@@ -13,6 +13,7 @@ import ownerTokens from './api/ownerTokens'
 const Home: NextPage = () => {
   const { data: account } = useAccount()
   const [zorbs, setZorbs] = useState({});
+  const [floor, setFloor] = useState(0);
 
   const networkInfo = {
       network: ZDKNetwork.Ethereum,
@@ -32,12 +33,10 @@ const Home: NextPage = () => {
     //  devs4Rev(zdk);
     const fetchData = async () => {
       const zorbData = await lastZorbSales(zdk);
-      // const holderNFts = await ownerTokens(zdk, account?.address);
-      // const data = await marketInfo(zdk, "0xca21d4228cdcc68d4e23807e5e370c07577dd152");
+      const marketFloor = await marketInfo(zdk);
 
       setZorbs(zorbData);
-      // console.log(holderNFts);
-      
+      setFloor(marketFloor);
     }
 
     fetchData();
@@ -60,13 +59,18 @@ const Home: NextPage = () => {
         </h1>
 
         <p className={styles.description}>
-          NFT data DUMP 🙃
+          Zorb recents data DUMP 
         </p>
+        
+        <code className={styles.code}>Floor: {floor}</code>
+        <b>🌜🌞🌛</b>
 
         <div className={styles.grid}>
             { zorbs?.sales?.nodes.map((item, index) => {
               let { tokenId, name, image } = item.token;
+              let { blockTimestamp } = item.sale.transactionInfo;
               let { nativePrice, usdcPrice } = item.sale.price;
+              let date = new Date(blockTimestamp);
 
               return (
                 <a key={index + 'a'} href={`https://zorb.dev/nft/${tokenId}`} className={styles.card}>
@@ -74,6 +78,7 @@ const Home: NextPage = () => {
                   <img key={index + 'img'} src={image.url} />
                   <h4 key={index+'ETH'} > {nativePrice.currency.name}: {nativePrice.decimal}</h4>
                   <p key={index+'USDC'} className={styles.price}>USDC: {usdcPrice.decimal.toFixed(2)}</p>
+                  <p key={index+'sale'} className={styles.price}>sold on: {date.toLocaleDateString('en-US')}</p>
                 </a>
               )
             }) }
